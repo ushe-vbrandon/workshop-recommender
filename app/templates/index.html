@@ -1,0 +1,23 @@
+<html>
+    <head>
+        <title>UDRC Foodie Recommender</title>
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/bootstrap.min.css') }}">
+    </head>
+    <body>
+        <h1>Welcome to the UDRC!</h1>
+        <p></p>
+        <h2>Users</h2>
+        <ul>
+        {% for user in users %}
+            <li>
+                {{ user }}
+            </li>
+        {% endfor %}
+        </ul>
+
+        <script src="{{ url_for('static', path='/js/jquery-3.3.1.slim.min.js') }}" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"></script>
+        <script src="{{ url_for('static', path='/js/popper.min.js') }}" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"></script>
+        <script src="{{ url_for('static', path='/js/bootstrap.min.js') }}" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"></script>
+    </body>
+</html>
