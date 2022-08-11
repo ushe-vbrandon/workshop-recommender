@@ -2,15 +2,13 @@
 API for Foodie Recommender!
 """
 
-import models
 import os
 from typing import List
 
 import json
 
-import models
-
-from settings import config
+import app.models as models
+from app.settings import config
 
 
 

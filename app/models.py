@@ -11,8 +11,7 @@ from typing import Any, List
 
 import json
 
-# import tensorflow_recommenders as tfrs
-from settings import config
+from app.settings import config
 
 
 
@@ -20,13 +19,26 @@ genres = {}
 
 
 
-def save_model_data(model: BaseModel, filename: str) -> str:
+def save_model_data(model: BaseModel, filename: str, format: str = 'txt') -> str:
+    
+    def save_as_json(model, filename) -> str:
+        with open(filename, 'w+') as file:
+            json.dump(model.json(), file)
+        return filename
+
+    def save_as_text(model, filename) -> str:
+        with open(filename ,'w+') as file:
+            file.write(json.dumps(model.json()))
+
     filename = os.path.join(os.getcwd(), config.DATADIR, filename)
-    with open(filename, 'w+') as file:
-        json.dump(model.json(), file)
-    return filename
 
+    file_mode_fns = {
+        'json': save_as_json,
+        'txt': save_as_text,
+    }    
 
+    save_fn = file_mode_fns[format]
+    return save_fn(model, filename)
 
 def create_empty_genres_file(filepath: str) -> None:
     with open(filepath, 'w+') as file:
@@ -84,9 +96,9 @@ class RestaurantUser(BaseModel):
         assert len(v) > 0, 'Must provide list of genre > 0'
         return map_genre(v)
     
-    def save(self, prefix='user') -> None:
-        name = prefix + f"_{self.user_id}.json"
-        return save_model_data(self, name)
+    def save(self, prefix='user', format='txt') -> None:
+        name = prefix + f"_{self.user_id}"
+        return save_model_data(self, name, format)
 
     
         
@@ -101,9 +113,9 @@ class Restaurant(BaseModel):
         assert len(v) > 0, 'Must provide list of genre > 0'
         return map_genre(v)
         
-    def save(self, prefix='restaurant') -> str:
+    def save(self, prefix='restaurant', format='txt') -> str:
         name = prefix + f"_{self.restaurant_id}.json"
-        return save_model_data(self, name)
+        return save_model_data(self, name, format)
     
     
     

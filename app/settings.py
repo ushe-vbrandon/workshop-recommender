@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     LOGLEVEL: str = 'INFO'
     LOGFILE: str = 'systemdat.log'
 
-    DATADIR: str = 'data'
+    DATADIR: str = 'app/data'
    
 config = Settings()
 

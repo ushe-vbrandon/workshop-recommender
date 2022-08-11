@@ -3,6 +3,9 @@ A workshop designed around collaboratively improving a local recommendation syst
 
 ## Running the Application
 
+```python
+uvicorn main:app --reload
+```
 
 ## References
 https://www.tensorflow.org/recommenders/examples/basic_retrieval
