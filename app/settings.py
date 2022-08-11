@@ -1,4 +1,5 @@
 import logging
+import os
 
 from pydantic import BaseSettings
 
@@ -7,7 +8,7 @@ class Settings(BaseSettings):
     LOGLEVEL: str = 'INFO'
     LOGFILE: str = 'systemdat.log'
 
-    DATADIR: str = 'app/data'
+    DATADIR: str = os.path.join(os.getcwd(), 'app', 'data')
    
 config = Settings()
 

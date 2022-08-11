@@ -18,17 +18,18 @@ from app.settings import config
 genres = {}
 
 
+# User Data Utilities
 
-def save_model_data(model: BaseModel, filename: str, format: str = 'txt') -> str:
+def save_model_data(model: BaseModel, filename: str, format: str = 'json') -> str:
     
     def save_as_json(model, filename) -> str:
         with open(filename, 'w+') as file:
-            json.dump(model.json(), file)
+            json.dump(dict(model), file)
         return filename
 
     def save_as_text(model, filename) -> str:
         with open(filename ,'w+') as file:
-            file.write(json.dumps(model.json()))
+            file.write(json.dumps(dict(model)))
 
     filename = os.path.join(os.getcwd(), config.DATADIR, filename)
 
@@ -40,6 +41,10 @@ def save_model_data(model: BaseModel, filename: str, format: str = 'txt') -> str
     save_fn = file_mode_fns[format]
     return save_fn(model, filename)
 
+
+
+# Genre Lookup Utilities
+
 def create_empty_genres_file(filepath: str) -> None:
     with open(filepath, 'w+') as file:
         json.dump({}, file)
@@ -48,26 +53,37 @@ def create_empty_genres_file(filepath: str) -> None:
         
 
 def load_or_create_genres(genres_file='genres.json') -> dict:
-    if os.path.isfile(genres_file):
-        with open(genres_file, 'r') as file:
+    filepath = os.path.join(os.getcwd(), config.DATADIR, genres_file)
+    if os.path.isfile(filepath):
+        with open(filepath, 'r') as file:
             return json.load(file)
     else:
-        print('file not found', genres_file)
-        return create_empty_genres_file(genres_file)
+        print('file not found', filepath)
+        return create_empty_genres_file(filepath)
 
 
     
 def save_genres(genres: dict, genres_file='genres.json') -> dict:
-    with open(genres_file, 'w+') as file:
+    filepath = os.path.join(os.getcwd(), config.DATADIR, genres_file)
+    with open(filepath, 'w+') as file:
         json.dump(genres, file)
     return genres
 
     
         
-def add_element_to_genres(element: str) -> int:
-    genres = load_or_create_genres()
+def add_element_to_genres(element: str, genres: dict) -> int:
+    
+    def is_num(x) -> bool:
+        try:
+            return int(x) != False
+        except:
+            return False
+    
     dict_len = len(genres)
-    if element not in genres:
+    
+    if is_num(element):
+        return element
+    elif element not in genres:
         genres[element] = dict_len + 1
         genres = save_genres(genres)
     return genres[element]
@@ -76,12 +92,15 @@ def add_element_to_genres(element: str) -> int:
         
 def map_genre(genre_list: list) -> list:
     tmp = []
+    genres = load_or_create_genres()
     for element in genre_list:
-        tmp.append(add_element_to_genres(element))
+        tmp.append(add_element_to_genres(element, genres))
     return tmp
         
 
-    
+
+# Data Models
+
 class RestaurantUser(BaseModel):
     user_birth_date: int
     user_genres: List[Any] = [0]
@@ -96,7 +115,7 @@ class RestaurantUser(BaseModel):
         assert len(v) > 0, 'Must provide list of genre > 0'
         return map_genre(v)
     
-    def save(self, prefix='user', format='txt') -> None:
+    def save(self, prefix='user', format='json') -> None:
         name = prefix + f"_{self.user_id}"
         return save_model_data(self, name, format)
 
@@ -113,8 +132,8 @@ class Restaurant(BaseModel):
         assert len(v) > 0, 'Must provide list of genre > 0'
         return map_genre(v)
         
-    def save(self, prefix='restaurant', format='txt') -> str:
-        name = prefix + f"_{self.restaurant_id}.json"
+    def save(self, prefix='restaurant', format='json') -> str:
+        name = prefix + f"_{self.restaurant_id}"
         return save_model_data(self, name, format)
     
     
@@ -129,8 +148,8 @@ class RestaurantRating(BaseModel):
     def convert_valid_time(cls, v: str):
         return v
     
-    def save(self, prefix='rating') -> str:
-        name = prefix + f"_{self.restaurant}_{self.user}_{self.timestamp}.json"
+    def save(self, prefix='rating', format='json') -> str:
+        name = prefix + f"_{self.restaurant}_{self.user}_{self.timestamp}"
         return save_model_data(self, name)
     
     def flatten(self) -> dict:
